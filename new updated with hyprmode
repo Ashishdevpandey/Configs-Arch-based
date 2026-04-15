@@ -1,0 +1,467 @@
+#!/bin/bash
+# ============================================
+# OMACHRY MASTER RESTORE SCRIPT
+# Created: 11 April 2026
+# Updated: 15 April 2026
+# Contains ALL customizations including:
+# - Hyprmode + Hyprexpo + Monitor Fix
+# ============================================
+
+echo "╔══════════════════════════════════════════╗"
+echo "║   🚀 OMACHRY MASTER RESTORE SCRIPT      ║"
+echo "║      Updated with Hyprmode & Hyprexpo   ║"
+echo "╚══════════════════════════════════════════╝"
+echo ""
+
+# --------------------------------------------
+# 1. ALACRITTY CONFIG
+# --------------------------------------------
+echo "[1/9] Restoring Alacritty config..."
+mkdir -p ~/.config/alacritty
+cat > ~/.config/alacritty/alacritty.toml << 'EOF'
+general.import = [ "~/.config/omarchy/current/theme/alacritty.toml" ]
+
+[env]
+TERM = "xterm-256color"
+
+[terminal]
+osc52 = "CopyPaste"
+
+[font]
+normal = { family = "iA Writer Mono S" }
+bold = { family = "iA Writer Mono S" }
+italic = { family = "iA Writer Mono S" }
+size = 9
+
+[window]
+padding.x = 14
+padding.y = 14
+decorations = "None"
+
+[keyboard]
+bindings = [
+{ key = "Insert", mods = "Shift", action = "Paste" },
+{ key = "Insert", mods = "Control", action = "Copy" },
+{ key = "Return", mods = "Shift", chars = "\u001B\r" }
+]
+EOF
+echo "   ✅ Alacritty config restored"
+
+# --------------------------------------------
+# 2. MONITORS CONFIG (External LEFT, Laptop RIGHT)
+# --------------------------------------------
+echo "[2/9] Restoring monitors config (External LEFT, Laptop RIGHT)..."
+mkdir -p ~/.config/hypr
+cat > ~/.config/hypr/monitors.conf << 'EOF'
+# Environment variable for GDK scaling
+env = GDK_SCALE,1.25
+
+# External monitor (HDMI) - positioned on the LEFT
+monitor=HDMI-A-1,preferred,0x0,1.25
+
+# Laptop screen (eDP-1) - positioned on the RIGHT
+monitor=eDP-1,preferred,1536x0,1.25
+EOF
+echo "   ✅ Monitors config restored"
+
+# --------------------------------------------
+# 2b. FIX MONITORS SCRIPT
+# --------------------------------------------
+echo "[2b/9] Creating fix-monitors.sh script..."
+cat > ~/.config/hypr/fix-monitors.sh << 'EOF'
+#!/bin/bash
+hyprctl keyword monitor HDMI-A-1,preferred,0x0,1.25
+hyprctl keyword monitor eDP-1,preferred,1536x0,1.25
+EOF
+chmod +x ~/.config/hypr/fix-monitors.sh
+echo "   ✅ Fix monitors script created"
+
+# --------------------------------------------
+# 3. GAPS CONFIG (No outer gaps)
+# --------------------------------------------
+echo "[3/9] Restoring gaps config (gaps_out=0, gaps_in=4)..."
+cat > ~/.config/hypr/looknfeel.conf << 'EOF'
+# Change the default Omarchy look'n'feel
+
+general {
+    gaps_out = 0
+    gaps_in = 4
+}
+
+decoration {
+    # rounding = 8
+}
+
+animations {
+    # enabled = no
+}
+
+layout {
+    # single_window_aspect_ratio = 1 1
+}
+EOF
+echo "   ✅ Gaps config restored"
+
+# --------------------------------------------
+# 4. BINDINGS CONFIG (All Shortcuts)
+# --------------------------------------------
+echo "[4/9] Restoring keyboard bindings..."
+cat > ~/.config/hypr/bindings.conf << 'EOF'
+# ============================================
+# APPLICATION BINDINGS
+# ============================================
+bindd = SUPER, RETURN, Terminal, exec, uwsm-app -- xdg-terminal-exec --dir="$(omarchy-cmd-terminal-cwd)"
+bindd = SUPER SHIFT, RETURN, Browser, exec, flatpak run app.zen_browser.zen
+bindd = SUPER SHIFT, F, File manager, exec, uwsm-app -- nautilus --new-window
+bindd = SUPER ALT SHIFT, F, File manager (cwd), exec, uwsm-app -- nautilus --new-window "$(omarchy-cmd-terminal-cwd)"
+bindd = SUPER SHIFT, B, Browser, exec, flatpak run app.zen_browser.zen
+bindd = SUPER SHIFT ALT, B, Browser (private), exec, flatpak run app.zen_browser.zen --private
+bindd = SUPER SHIFT, N, Editor, exec, omarchy-launch-editor
+
+# Omarchy Menu on Super + Space
+unbind = SUPER, SPACE
+bindd = SUPER, SPACE, Omarchy menu, exec, omarchy-menu
+
+# ============================================
+# WINDOW MANAGEMENT
+# ============================================
+bindd = SUPER, Q, Kill window, killactive
+bindd = SUPER, M, Fullscreen, fullscreen
+bindd = SUPER, T, Toggle split, togglesplit
+bindd = SUPER, S, Swap windows, exec, hyprctl dispatch swapnext
+
+# App Launcher
+bindd = SUPER, D, App launcher, exec, omarchy-launch-walker
+
+# Overview (Hyprexpo - KDE Style)
+bindd = SUPER, TAB, Overview (KDE-style), hyprexpo:expo, toggle
+
+# ============================================
+# MONITOR CONTROLS
+# ============================================
+# Move focus to other monitor
+bindd = SUPER, period, Focus next monitor, exec, hyprctl dispatch focusmonitor +1
+bindd = SUPER, comma, Focus previous monitor, exec, hyprctl dispatch focusmonitor -1
+
+# Move window to other monitor
+bindd = SUPER SHIFT, period, Move window to next monitor, movewindow, mon:+
+bindd = SUPER SHIFT, comma, Move window to previous monitor, movewindow, mon:-
+
+# Hyprmode Display Switcher
+bindd = SUPER SHIFT, P, Display switcher, exec, alacritty --class hyprmode -e hyprmode
+
+# Fix Monitor Order (External LEFT, Laptop RIGHT)
+bindd = SUPER ALT, E, Fix Monitor Order, exec, hyprctl keyword monitor HDMI-A-1,preferred,0x0,1.25 ; hyprctl keyword monitor eDP-1,preferred,1536x0,1.25
+
+# ============================================
+# SCREENSHOTS
+# ============================================
+bindd = , Print, Screenshot area (copy), exec, grimblast --notify copy area
+bindd = SHIFT, Print, Screenshot area (save), exec, grimblast save area
+bindd = SUPER, Print, Screenshot screen, exec, grimblast copy output
+bindd = SUPER SHIFT, S, Screenshot area, exec, grimblast --notify copy area
+
+# ============================================
+# SYSTEM
+# ============================================
+bindd = SUPER SHIFT, Q, Exit Hyprland, exec, hyprctl dispatch exit
+bindd = SUPER SHIFT, R, Reload config, exec, hyprctl reload
+bindd = SUPER, L, Lock screen, exec, loginctl lock-session
+
+# ============================================
+# WORKSPACE NAVIGATION
+# ============================================
+bindd = SUPER, 1, Workspace 1, workspace, 1
+bindd = SUPER, 2, Workspace 2, workspace, 2
+bindd = SUPER, 3, Workspace 3, workspace, 3
+bindd = SUPER, 4, Workspace 4, workspace, 4
+bindd = SUPER, 5, Workspace 5, workspace, 5
+bindd = SUPER, 6, Workspace 6, workspace, 6
+bindd = SUPER, 7, Workspace 7, workspace, 7
+bindd = SUPER, 8, Workspace 8, workspace, 8
+bindd = SUPER, 9, Workspace 9, workspace, 9
+bindd = SUPER, 0, Workspace 10, workspace, 10
+
+# Move windows to workspaces
+bindd = SUPER SHIFT, 1, Move to workspace 1, movetoworkspace, 1
+bindd = SUPER SHIFT, 2, Move to workspace 2, movetoworkspace, 2
+bindd = SUPER SHIFT, 3, Move to workspace 3, movetoworkspace, 3
+bindd = SUPER SHIFT, 4, Move to workspace 4, movetoworkspace, 4
+bindd = SUPER SHIFT, 5, Move to workspace 5, movetoworkspace, 5
+bindd = SUPER SHIFT, 6, Move to workspace 6, movetoworkspace, 6
+bindd = SUPER SHIFT, 7, Move to workspace 7, movetoworkspace, 7
+bindd = SUPER SHIFT, 8, Move to workspace 8, movetoworkspace, 8
+bindd = SUPER SHIFT, 9, Move to workspace 9, movetoworkspace, 9
+bindd = SUPER SHIFT, 0, Move to workspace 10, movetoworkspace, 10
+
+# ============================================
+# WINDOW MOVEMENT
+# ============================================
+bindd = SUPER, left, Focus left, movefocus, l
+bindd = SUPER, right, Focus right, movefocus, r
+bindd = SUPER, up, Focus up, movefocus, u
+bindd = SUPER, down, Focus down, movefocus, d
+
+bindd = SUPER SHIFT, left, Move window left, movewindow, l
+bindd = SUPER SHIFT, right, Move window right, movewindow, r
+bindd = SUPER SHIFT, up, Move window up, movewindow, u
+bindd = SUPER SHIFT, down, Move window down, movewindow, d
+
+# ============================================
+# MISC
+# ============================================
+unbind = SUPER, W
+
+bindd = SUPER, H, Minimize window, movetoworkspacesilent, 10
+bindd = SUPER SHIFT, H, Restore window, exec, ~/.config/hypr/scripts/restore-window.sh
+
+# True fullscreen
+unbind = SUPER SHIFT, BackSpace
+bindd = SUPER SHIFT, BackSpace, True fullscreen, fullscreen
+
+# Overview (Scratchpad fallback)
+bindd = SUPER, A, Window Overview, exec, omarchy-scratchpad
+EOF
+echo "   ✅ Bindings restored"
+
+# --------------------------------------------
+# 5. HYPRLAND MAIN CONFIG
+# --------------------------------------------
+echo "[5/9] Configuring hyprland.conf..."
+if ! grep -q "fullscreen = 1" ~/.config/hypr/hyprland.conf 2>/dev/null; then
+    echo "" >> ~/.config/hypr/hyprland.conf
+    echo "# True fullscreen - window takes entire screen" >> ~/.config/hypr/hyprland.conf
+    echo "fullscreen = 1" >> ~/.config/hypr/hyprland.conf
+fi
+
+# Add Hyprexpo plugin config
+if ! grep -q "hyprexpo" ~/.config/hypr/hyprland.conf 2>/dev/null; then
+    echo "" >> ~/.config/hypr/hyprland.conf
+    echo "# Hyprexpo Overview Plugin" >> ~/.config/hypr/hyprland.conf
+    echo "plugin {" >> ~/.config/hypr/hyprland.conf
+    echo "    hyprexpo {" >> ~/.config/hypr/hyprland.conf
+    echo "        columns = 3" >> ~/.config/hypr/hyprland.conf
+    echo "        gap_size = 5" >> ~/.config/hypr/hyprland.conf
+    echo "        bg_col = rgb(111111)" >> ~/.config/hypr/hyprland.conf
+    echo "        workspace_method = center current" >> ~/.config/hypr/hyprland.conf
+    echo "    }" >> ~/.config/hypr/hyprland.conf
+    echo "}" >> ~/.config/hypr/hyprland.conf
+fi
+
+# Add Hyprmode floating window rule
+if ! grep -q "hyprmode" ~/.config/hypr/hyprland.conf 2>/dev/null; then
+    echo "" >> ~/.config/hypr/hyprland.conf
+    echo "# Hyprmode floating window" >> ~/.config/hypr/hyprland.conf
+    echo "windowrulev2 = float, class:hyprmode" >> ~/.config/hypr/hyprland.conf
+    echo "windowrulev2 = size 600 400, class:hyprmode" >> ~/.config/hypr/hyprland.conf
+    echo "windowrulev2 = center, class:hyprmode" >> ~/.config/hypr/hyprland.conf
+fi
+echo "   ✅ Hyprland config updated"
+
+# --------------------------------------------
+# 6. BASHRC (Fastfetch on terminal open)
+# --------------------------------------------
+echo "[6/9] Restoring .bashrc..."
+if ! grep -q "fastfetch" ~/.bashrc 2>/dev/null; then
+    echo "" >> ~/.bashrc
+    echo "# Run fastfetch on terminal open" >> ~/.bashrc
+    echo "fastfetch" >> ~/.bashrc
+fi
+echo "   ✅ Bashrc restored"
+
+# --------------------------------------------
+# 7. FASTFETCH CONFIG
+# --------------------------------------------
+echo "[7/9] Restoring fastfetch config..."
+mkdir -p ~/.config/fastfetch
+cat > ~/.config/fastfetch/config.jsonc << 'EOF'
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "type": "none",
+    "source": "/home/ashish/Pictures/Terminal/pngegg.png",
+    "color": { "1": "green" },
+    "padding": {
+      "top": 2,
+      "right": 6,
+      "left": 2
+    }
+  },
+  "modules": [
+    "break",
+    {
+      "type": "custom",
+      "format": "\u001b[90m┌──────────────────────Hardware──────────────────────┐"
+    },
+    {
+      "type": "host",
+      "key": " PC",
+      "keyColor": "green"
+    },
+    {
+      "type": "cpu",
+      "key": "│ ├",
+      "showPeCoreCount": true,
+      "keyColor": "green"
+    },
+    {
+      "type": "gpu",
+      "key": "│ ├",
+      "detectionMethod": "pci",
+      "keyColor": "green"
+    },
+    {
+      "type": "display",
+      "key": "│ ├󱄄",
+      "keyColor": "green"
+    },
+    {
+      "type": "disk",
+      "key": "│ ├󰋊",
+      "keyColor": "green"
+    },
+    {
+      "type": "memory",
+      "key": "│ ├",
+      "keyColor": "green"
+    },
+    {
+      "type": "swap",
+      "key": "└ └󰓡 ",
+      "keyColor": "green"
+    },
+    {
+      "type": "custom",
+      "format": "\u001b[90m└────────────────────────────────────────────────────┘"
+    },
+    "break",
+    {
+      "type": "custom",
+      "format": "\u001b[90m┌──────────────────────Software──────────────────────┐"
+    },
+    {
+      "type": "command",
+      "key": "\ue900 OS",
+      "keyColor": "blue",
+      "text": "version=$(omarchy-version); echo \"Omarchy $version\""
+    },
+    {
+      "type": "command",
+      "key": "│ ├󰘬",
+      "keyColor": "blue",
+      "text": "branch=$(omarchy-version-branch); echo \"$branch\""
+    },
+    {
+      "type": "command",
+      "key": "│ ├󰔫",
+      "keyColor": "blue",
+      "text": "channel=$(omarchy-version-channel); echo \"$channel\""
+    },
+    {
+      "type": "kernel",
+      "key": "│ ├",
+      "keyColor": "blue"
+    },
+    {
+      "type": "wm",
+      "key": "│ ├",
+      "keyColor": "blue"
+    },
+    {
+      "type": "de",
+      "key": " DE",
+      "keyColor": "blue"
+    },
+    {
+      "type": "terminal",
+      "key": "│ ├",
+      "keyColor": "blue"
+    },
+    {
+      "type": "packages",
+      "key": "│ ├󰏖",
+      "keyColor": "blue"
+    },
+    {
+      "type": "wmtheme",
+      "key": "│ ├󰉼",
+      "keyColor": "blue"
+    },
+    {
+      "type": "command",
+      "key": "│ ├󰸌",
+      "keyColor": "blue",
+      "text": "theme=$(omarchy-theme-current); echo -e \"$theme \\e[38m●\\e[37m●\\e[36m●\\e[35m●\\e[34m●\\e[33m●\\e[32m●\\e[31m●\""
+    },
+    {
+      "type": "terminalfont",
+      "key": "└ └",
+      "keyColor": "blue"
+    },
+    {
+      "type": "custom",
+      "format": "\u001b[90m└────────────────────────────────────────────────────┘"
+    },
+    "break",
+    {
+      "type": "custom",
+      "format": "\u001b[90m┌────────────────Age / Uptime / Update───────────────┐"
+    },
+    {
+      "type": "command",
+      "key": "󱦟 OS Age",
+      "keyColor": "magenta",
+      "text": "echo $(( ($(date +%s) - $(stat -c %W /)) / 86400 )) days"
+    },
+    {
+      "type": "uptime",
+      "key": "󱫐 Uptime",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "command",
+      "key": " Update",
+      "keyColor": "magenta",
+      "text": "updated=$(omarchy-version-pkgs); echo \"$updated\""
+    },
+    {
+      "type": "custom",
+      "format": "\u001b[90m└────────────────────────────────────────────────────┘"
+    },
+    "break"
+  ]
+}
+EOF
+echo "   ✅ Fastfetch config restored"
+
+# --------------------------------------------
+# 8. INSTALL REQUIRED PACKAGES
+# --------------------------------------------
+echo "[8/9] Installing required packages..."
+sudo pacman -S --noconfirm alacritty grimblast fastfetch waybar hyprland hyprmode 2>/dev/null
+echo "   ✅ Packages installed"
+
+# --------------------------------------------
+# 9. ENABLE HYPREXPO PLUGIN
+# --------------------------------------------
+echo "[9/9] Enabling Hyprexpo plugin..."
+if command -v hyprpm &> /dev/null; then
+    hyprpm add https://github.com/hyprwm/hyprland-plugins 2>/dev/null
+    hyprpm enable hyprexpo 2>/dev/null
+    echo "   ✅ Hyprexpo plugin enabled"
+else
+    echo "   ⚠️  hyprpm not found - install manually"
+fi
+
+# --------------------------------------------
+# RELOAD HYPRLAND
+# --------------------------------------------
+echo ""
+echo "╔══════════════════════════════════════════╗"
+echo "║   ✅ RESTORE COMPLETE!                   ║"
+echo "╚══════════════════════════════════════════╝"
+echo ""
+echo "Now run: hyprctl reload"
+echo "Or press: SUPER + SHIFT + R"
+echo ""
+hyprctl reload 2>/dev/null && echo "✅ Hyprland reloaded!" || echo "⚠️  Run 'hyprctl reload' manually"
