@@ -137,7 +137,7 @@ general {
     # No gaps at screen edges (removes gap between bar and windows)
     gaps_out = 0
     # Keep inner gaps between windows (change to 0 if you want none)
-    gaps_in = 4
+    gaps_in = 0
     # border_size = 0
 
     # Change to niri-like side-scrolling layout
