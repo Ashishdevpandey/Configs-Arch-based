@@ -1,70 +1,82 @@
-# WhiteSur KDE Configuration
+# Ashish's Omarchy Config Backup
 
-A personal configuration setup for KDE Plasma, designed to replicate the elegant and modern look of macOS Big Sur on Linux. This repository contains configuration files for the WhiteSur global theme, Kvantum theme, and associated wallpapers.
+Personal configuration files for **Omarchy** (Arch Linux + Hyprland) setup.
 
-## Features
+> Migrated from KDE Plasma → now fully on **Omarchy + Hyprland**
 
-*   **Global Theme**: WhiteSur (Dark/Light) - A clean and polished theme inspired by macOS Big Sur.
-*   **Kvantum Theme**: WhiteSur - Provides consistent styling for Qt applications.
-*   **Icons**: WhiteSur icon theme - Matches the overall aesthetic.
-*   **Wallpapers**: A collection of high-quality wallpapers to complement the theme.
-*   **Fonts**:
-    *   **UI Font**: Inter (10pt)
-    *   **Monospace Font**: Liberation Mono (10pt)
+---
 
-## Installation
+## What's Inside
 
-> [!WARNING]
-> **Backup your existing configurations before proceeding.** This process involves overwriting configuration files which may result in the loss of your current settings.
+### `hypr/`
+Custom Hyprland configuration files:
 
-### Prerequisites
+| File | Purpose |
+|---|---|
+| `hyprland.conf` | Main config — sources all others |
+| `bindings.conf` | All keybindings (Win+Tab workspace overview, Win+W wallpaper picker, Win+N Antigravity AI, scratchpad, audio, media) |
+| `autostart.conf` | Custom autostart (mpd, wallpaper restore, monitor listener) |
+| `monitors.conf` | Dual monitor layout — HDMI-A-1 + eDP-1 @ 1.25 scale |
+| `looknfeel.conf` | Gaps, borders |
+| `input.conf` | Keyboard layout, touchpad natural scroll, repeat rate |
+| `windows.conf` | Window rules — hyprmode float, scratchpad, Night Light |
+| `hyprlock.conf` | Lock screen — custom input field with JetBrainsMono |
+| `hypridle.conf` | Screensaver after 2.5min, lock after 5min |
+| `lid-switch.conf` | Auto lid close/open detection |
+| `dms/` | DMS-generated layout (gaps, rounding) |
+| `scripts/` | workspace wallpaper, monitor listener, lid handler |
 
-Ensure you have the following installed on your system:
-*   **KDE Plasma Desktop**
-*   **Kvantum Manager**: For applying the Kvantum theme.
-*   **WhiteSur Gtk/KDE Theme**: It is recommended to install the upstream WhiteSur theme packages for full asset availability.
+### `scripts/`
+Custom user scripts:
 
-### Manual Installation
+| File | Purpose |
+|---|---|
+| `wallpaper_picker.py` | Full custom wallpaper picker GUI (Win+W) — per-workspace wallpapers |
+| `toggle_wallpaper_picker.sh` | Toggle script for wallpaper picker |
+| `apply_last_wallpaper.sh` | Restore last wallpaper on login |
 
-1.  **Clone the repository** (if you haven't already):
-    ```bash
-    git clone https://github.com/Ashishdevpandey/Config-Garuda-Mokka.git
-    cd config
-    ```
+### `omarchy/`
+Omarchy-specific customizations:
 
-2.  **Copy Configuration Files**:
-    Copy the contents of this repository to your local configuration directories.
+| File | Purpose |
+|---|---|
+| `config.toml` | Default browser (Zen), webapp browser (Chrome) |
+| `branding/screensaver.txt` | Custom ASHISH ASCII art for screensaver |
+| `branding/about.txt` | Custom ASCII logo for about screen |
+| `branding/plymouth_logo.png` | Custom Plymouth boot splash logo |
+| `branding/limine-katana.png` | Custom Limine bootloader background wallpaper |
+| `themes/harbordark/` | Custom harbordark Omarchy theme |
 
-    *   **KDE Globals & Applet Configs**:
-        ```bash
-        cp kdeglobals ~/.config/
-        cp plasma-org.kde.plasma.desktop-appletsrc ~/.config/
-        ```
+### `restore/`
+Restore scripts:
 
-    *   **Kvantum Theme**:
-        ```bash
-        mkdir -p ~/.config/Kvantum
-        cp -r Kvantum/* ~/.config/Kvantum/
-        ```
+| File | Purpose |
+|---|---|
+| `fix-everything.sh` | Master restore script — reapplies all configs |
+| `Omarchy-Restore.sh` | Omarchy-specific restore |
 
-    *   **Wallpapers**:
-        ```bash
-        mkdir -p ~/.local/share/wallpapers
-        cp -r wallpapers/* ~/.local/share/wallpapers/
-        ```
+---
 
-    *   **Color Schemes**:
-        ```bash
-        mkdir -p ~/.local/share/color-schemes
-        cp -r color-schemes/* ~/.local/share/color-schemes/
-        ```
+## Key Keybindings (Custom)
 
-3.  **Apply Settings**:
-    *   Open **System Settings**.
-    *   Go to **Appearance** -> **Global Theme** and select **WhiteSur**.
-    *   Go to **Appearance** -> **Application Style** -> **Kvantum** to ensure Kvantum is selected.
-    *   Open **Kvantum Manager** and select the **WhiteSur** theme
+| Keys | Action |
+|---|---|
+| `Win + Tab` | Workspace overview (hyprexpo) |
+| `Win + W` | Wallpaper picker |
+| `Win + N` | Antigravity AI |
+| `Win + B` | Zen Browser |
+| `Win + D` | App launcher (Walker) |
+| `Win + Space` | Omarchy menu |
+| `Win + `` ` | Scratchpad toggle |
+| `Win + H` | Minimize to workspace 10 |
+| `Win + L` | Lock screen |
 
-## License
+---
 
-This configuration is for personal use. The WhiteSur theme and assets are subject to their respective licenses.
+## Quick Restore
+
+```bash
+git clone git@github.com:Ashishdevpandey/Configs-Arch-based.git
+cd Configs-Arch-based
+bash fix-everything.sh
+```

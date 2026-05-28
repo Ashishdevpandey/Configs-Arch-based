@@ -1,0 +1,5 @@
+# Browser to use for web apps (--app mode)
+webapp_browser = "google-chrome-stable"
+
+# Default browser for normal browsing
+default_browser = "flatpak run app.zen_browser.zen"
