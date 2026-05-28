@@ -1,82 +1,60 @@
-# Ashish's Omarchy Config Backup
+# Ashish's Omarchy System Configurations
 
-Personal configuration files for **Omarchy** (Arch Linux + Hyprland) setup.
-
-> Migrated from KDE Plasma → now fully on **Omarchy + Hyprland**
+This repository contains the complete, reproducible backup of your personalized **Omarchy** Linux environment (Arch Linux + Hyprland), including custom scripting, bootloaders, themes, wallpapers, and Plymouth boot splash animations.
 
 ---
 
-## What's Inside
+## 📁 Repository Structure
 
-### `hypr/`
-Custom Hyprland configuration files:
-
-| File | Purpose |
+| Directory | Description |
 |---|---|
-| `hyprland.conf` | Main config — sources all others |
-| `bindings.conf` | All keybindings (Win+Tab workspace overview, Win+W wallpaper picker, Win+N Antigravity AI, scratchpad, audio, media) |
-| `autostart.conf` | Custom autostart (mpd, wallpaper restore, monitor listener) |
-| `monitors.conf` | Dual monitor layout — HDMI-A-1 + eDP-1 @ 1.25 scale |
-| `looknfeel.conf` | Gaps, borders |
-| `input.conf` | Keyboard layout, touchpad natural scroll, repeat rate |
-| `windows.conf` | Window rules — hyprmode float, scratchpad, Night Light |
-| `hyprlock.conf` | Lock screen — custom input field with JetBrainsMono |
-| `hypridle.conf` | Screensaver after 2.5min, lock after 5min |
-| `lid-switch.conf` | Auto lid close/open detection |
-| `dms/` | DMS-generated layout (gaps, rounding) |
-| `scripts/` | workspace wallpaper, monitor listener, lid handler |
-
-### `scripts/`
-Custom user scripts:
-
-| File | Purpose |
-|---|---|
-| `wallpaper_picker.py` | Full custom wallpaper picker GUI (Win+W) — per-workspace wallpapers |
-| `toggle_wallpaper_picker.sh` | Toggle script for wallpaper picker |
-| `apply_last_wallpaper.sh` | Restore last wallpaper on login |
-
-### `omarchy/`
-Omarchy-specific customizations:
-
-| File | Purpose |
-|---|---|
-| `config.toml` | Default browser (Zen), webapp browser (Chrome) |
-| `branding/screensaver.txt` | Custom ASHISH ASCII art for screensaver |
-| `branding/about.txt` | Custom ASCII logo for about screen |
-| `branding/plymouth_logo.png` | Custom Plymouth boot splash logo |
-| `branding/limine-katana.png` | Custom Limine bootloader background wallpaper |
-| `themes/harbordark/` | Custom harbordark Omarchy theme |
-
-### `restore/`
-Restore scripts:
-
-| File | Purpose |
-|---|---|
-| `fix-everything.sh` | Master restore script — reapplies all configs |
-| `Omarchy-Restore.sh` | Omarchy-specific restore |
+| [`hypr/`](file:///home/ashish/.config/omarchy/repo-clone/hypr) | Full Hyprland settings, keybindings, window rules, OSDs, idle handlers, and lid switches. |
+| [`scripts/`](file:///home/ashish/.config/omarchy/repo-clone/scripts) | Custom system utilities including the Python GUI Wallpaper Picker and setup scripts. |
+| [`omarchy/`](file:///home/ashish/.config/omarchy/repo-clone/omarchy) | Branding text assets (ASCII arts), config parameters, and the custom `harbordark` theme. |
+| [`boot/`](file:///home/ashish/.config/omarchy/repo-clone/boot) | Backup of `/boot/limine.conf` containing boot interface colors and Snapper snapshots sync. |
+| [`plymouth/`](file:///home/ashish/.config/omarchy/repo-clone/plymouth) | Core Plymouth configuration settings. |
+| [`sddm/`](file:///home/ashish/.config/omarchy/repo-clone/sddm) | SDDM login manager theme details. |
+| [`wallpapers/`](file:///home/ashish/.config/omarchy/repo-clone/wallpapers) | Copies of the active desktop wallpapers and dual monitor backgrounds. |
 
 ---
 
-## Key Keybindings (Custom)
+## 🚀 Restoration Guide (How to Rebuild System)
 
-| Keys | Action |
-|---|---|
-| `Win + Tab` | Workspace overview (hyprexpo) |
-| `Win + W` | Wallpaper picker |
-| `Win + N` | Antigravity AI |
-| `Win + B` | Zen Browser |
-| `Win + D` | App launcher (Walker) |
-| `Win + Space` | Omarchy menu |
-| `Win + `` ` | Scratchpad toggle |
-| `Win + H` | Minimize to workspace 10 |
-| `Win + L` | Lock screen |
+To restore this entire configuration on a fresh installation of Omarchy Linux:
+
+1. **Clone this repository** to your local system:
+   ```bash
+   git clone git@github.com:Ashishdevpandey/Configs-Arch-based.git ~/.config/omarchy/repo-clone
+   ```
+
+2. **Navigate to the repository** folder:
+   ```bash
+   cd ~/.config/omarchy/repo-clone
+   ```
+
+3. **Run the master restore script**:
+   ```bash
+   ./restore.sh
+   ```
+   *(Alternatively, you can run `./Omarchy-Restore.sh`)*
+
+The script will automatically prompt for your `sudo` password to install system dependencies, copy system files to `/boot` and `/etc`, and rebuild the Plymouth initramfs boot splash.
 
 ---
 
-## Quick Restore
+## ⌨️ Primary Custom Keybindings
 
-```bash
-git clone git@github.com:Ashishdevpandey/Configs-Arch-based.git
-cd Configs-Arch-based
-bash fix-everything.sh
-```
+| Keybinding | Action |
+|---|---|
+| `SUPER + Enter` | Open Alacritty Terminal |
+| `SUPER + Shift + Enter` | Open Zen Browser |
+| `SUPER + Shift + F` | Open File Manager (Nautilus) |
+| `SUPER + Space` | Open Omarchy Application/Command Menu |
+| `SUPER + D` | Open App Launcher (Walker) |
+| `SUPER + TAB` | Toggle Workspace Overview (Hyprexpo) |
+| `SUPER + W` | Toggle Wallpaper Picker GUI |
+| `SUPER + L` | Lock Screen immediately |
+| `SUPER + Q` | Close active window |
+| `SUPER + Escape` | Power off system |
+| `Print` | Capture screenshot of an area to clipboard |
+| `Shift + Print` | Capture screenshot of an area and save |
